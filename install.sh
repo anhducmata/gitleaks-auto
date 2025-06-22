@@ -1,15 +1,24 @@
 #!/bin/bash
 
-echo "🚀 Installing Gitleaks and setting up global Git hook..."
+echo "🚀 [git-shield] Installing Gitleaks and setting up global Git hook..."
 
-if ! command -v gitleaks &> /dev/null
-then
-    echo "📦 Installing Gitleaks..."
-    brew install gitleaks
+# Check if gitleaks is installed
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "📦 Gitleaks not found. Installing via Homebrew..."
+  if command -v brew >/dev/null 2>&1; then
+    brew install gitleaks || {
+      echo "❌ Failed to install gitleaks"
+      exit 1
+    }
+  else
+    echo "❌ Homebrew not found. Cannot install gitleaks automatically."
+    exit 1
+  fi
 else
-    echo "✅ Gitleaks already installed."
+  echo "✅ Gitleaks already installed."
 fi
 
+# Create global pre-commit hook
 HOOK_DIR="$HOME/.git-template/hooks"
 mkdir -p "$HOOK_DIR"
 
@@ -30,5 +39,5 @@ EOF
 chmod +x "$HOOK_DIR/pre-commit"
 git config --global init.templateDir "$HOME/.git-template"
 
-echo "✅ Gitleaks global hook installed."
-echo "💡 Run 'git init' inside existing repos to activate the hook."
+echo "✅ Global Git hook installed."
+echo "💡 To apply to existing repos, run: git init"
