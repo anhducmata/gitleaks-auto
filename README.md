@@ -43,6 +43,13 @@ Local hooks are machine- or repo-scoped and always skippable with `--no-verify` 
 that's a property of git hooks, not this tool. Pair with the CI backstop for a
 check nothing can bypass.
 
+## Output
+
+The hook uses a color/severity system so the result is unmistakable at a glance:
+
+- 🔴 **CRITICAL** (red, bold) — secret found, commit blocked
+- 🟢 **PASSED** (green, bold) — no secret found, commit proceeds
+
 ## Proof of scan
 
 Every passing commit gets a `Gitleaks-Scanned: passed (gitleaks <version>)` trailer

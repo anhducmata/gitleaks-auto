@@ -24,15 +24,22 @@ mkdir -p "$HOOK_DIR"
 
 cat << 'EOF' > "$HOOK_DIR/pre-commit"
 #!/bin/bash
-echo "🔍 Running Gitleaks scan..."
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+GREEN='\033[0;32m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+echo -e "${BOLD}🔍 Running Gitleaks scan...${RESET}"
 gitleaks protect --staged --source . --verbose --redact
 
 if [ $? -ne 0 ]; then
-    echo "❌ Gitleaks detected secrets! Commit blocked."
+    echo -e "${BOLD}${RED}🔴 CRITICAL: secrets detected — commit blocked.${RESET}"
+    echo -e "${YELLOW}   Remove or rotate the secret, then re-stage and commit again.${RESET}"
     exit 1
 fi
 
-echo "✅ No secrets found. Proceeding with commit."
+echo -e "${BOLD}${GREEN}🟢 PASSED: no secrets found — proceeding with commit.${RESET}"
 exit 0
 EOF
 
