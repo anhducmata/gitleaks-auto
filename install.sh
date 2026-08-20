@@ -37,6 +37,20 @@ exit 0
 EOF
 
 chmod +x "$HOOK_DIR/pre-commit"
+
+cat << 'EOF' > "$HOOK_DIR/prepare-commit-msg"
+#!/bin/bash
+# Runs after pre-commit already passed, so reaching this point means
+# gitleaks found no secrets in the staged changes.
+COMMIT_MSG_FILE="$1"
+GITLEAKS_VERSION="$(gitleaks version 2>/dev/null)"
+
+if ! grep -q "^Gitleaks-Scanned:" "$COMMIT_MSG_FILE" 2>/dev/null; then
+  printf '\nGitleaks-Scanned: passed (gitleaks %s)\n' "$GITLEAKS_VERSION" >> "$COMMIT_MSG_FILE"
+fi
+EOF
+
+chmod +x "$HOOK_DIR/prepare-commit-msg"
 git config --global init.templateDir "$HOME/.git-template"
 
 echo "✅ Global Git hook installed."

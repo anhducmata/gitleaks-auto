@@ -57,5 +57,19 @@ assert_case "Clean text file"     $'hello world\nthis is just a readme line\n' a
 assert_case "Known AWS doc example key (allowlisted)" $'AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE' allow
 
 echo
+echo "== trailer test =="
+setup_repo
+echo hello > payload.txt
+git add payload.txt
+git commit -m "trailer test" >/tmp/gl_test_out.log 2>&1
+if git log -1 --pretty=%B | grep -q "^Gitleaks-Scanned: passed"; then
+  echo "✅ PASS  [prepare-commit-msg trailer added on passing commit]"
+  PASS=$((PASS+1))
+else
+  echo "❌ FAIL  [prepare-commit-msg trailer missing on passing commit]"
+  FAIL=$((FAIL+1))
+fi
+
+echo
 echo "== Results: $PASS passed, $FAIL failed =="
 [ "$FAIL" -eq 0 ]

@@ -43,6 +43,13 @@ Local hooks are machine- or repo-scoped and always skippable with `--no-verify` 
 that's a property of git hooks, not this tool. Pair with the CI backstop for a
 check nothing can bypass.
 
+## Proof of scan
+
+Every passing commit gets a `Gitleaks-Scanned: passed (gitleaks <version>)` trailer
+appended to its message, via a `prepare-commit-msg` hook that only runs after
+`pre-commit` already succeeded. A blocked commit never happens, so it never gets
+one — the trailer only appears on commits that were actually scanned clean.
+
 ## Why not just use Gitleaks directly?
 
 Gitleaks itself doesn't wire itself into git — you'd manually create the hook,
