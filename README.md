@@ -75,3 +75,11 @@ This is a **local, client-side** hook, so it has the same limits as any git hook
 - **Machine-local only** — it protects commits made on machines where it's installed. It doesn't protect commits pushed from a machine that never ran the installer, and it isn't a server-side control.
 
 For defense in depth, pair this with a server-side backstop such as GitHub secret scanning / push protection, or a CI job that re-runs `gitleaks detect` on every push or pull request.
+
+## Credits
+
+All secret detection here is done by [Gitleaks](https://github.com/gitleaks/gitleaks)
+(MIT licensed) — this repo doesn't implement any detection logic itself. It's an
+installer/wrapper that installs Gitleaks and wires it into a git pre-commit hook
+(globally or per-repo). All credit for rule design, entropy detection, and the
+scanning engine belongs to the Gitleaks project and its contributors.
