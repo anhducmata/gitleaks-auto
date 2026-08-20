@@ -25,7 +25,7 @@ mkdir -p "$HOOK_DIR"
 cat << 'EOF' > "$HOOK_DIR/pre-commit"
 #!/bin/bash
 echo "🔍 Running Gitleaks scan..."
-gitleaks detect --source . --verbose --redact
+gitleaks protect --staged --source . --verbose --redact
 
 if [ $? -ne 0 ]; then
     echo "❌ Gitleaks detected secrets! Commit blocked."
