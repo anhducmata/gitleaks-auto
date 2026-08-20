@@ -43,6 +43,14 @@ Local hooks are machine- or repo-scoped and always skippable with `--no-verify` 
 that's a property of git hooks, not this tool. Pair with the CI backstop for a
 check nothing can bypass.
 
+## Why not just use Gitleaks directly?
+
+Gitleaks itself doesn't wire itself into git — you'd manually create the hook,
+set `init.templateDir` for global coverage, or write your own `.githooks` +
+`core.hooksPath` setup. This repo packages that setup into one command, at
+whichever scope you need (machine, repo, or CI). It adds no detection logic —
+just the wiring Gitleaks leaves as a manual step.
+
 ## Credits
 
 All detection is [Gitleaks](https://github.com/gitleaks/gitleaks) (MIT). This repo
