@@ -50,21 +50,22 @@ For a check that can't be bypassed by the committing client, add
 `.github/workflows/gitleaks.yml`. It re-scans every push and pull request
 server-side, independent of local setup.
 
-## Which ways of committing does this block?
+## What's actually protected?
 
-Git hooks run based on the `git commit` porcelain command itself, not on whatever
-triggered it — so this blocks a leaked secret regardless of how the commit was made,
-as long as it goes through the real `git` binary. Verified to block secrets when
-committing via:
+Git hooks fire based on the `git commit` porcelain command itself, not on whatever
+triggered it — so this blocks a leaked secret regardless of how the commit was
+made, as long as it goes through the real `git` binary and a hook is installed
+(global or per-repo).
 
-- Plain terminal — `git commit`
-- IDE git integrations — VS Code, JetBrains, etc. (they shell out to `git`)
-- AI coding assistants — GitHub Copilot, Claude Code, and similar tools that run
-  `git commit` on your behalf
-
-What it does **not** block: commits made with `git commit --no-verify` (explicitly
-skips hooks), and any commit made on a machine where this hook was never installed
-(see Limitations below).
+| Scenario | Protected? | Why |
+|---|---|---|
+| Plain terminal — `git commit` | ✅ Yes | Runs the real `git` binary, hook fires |
+| IDE git integrations (VS Code, JetBrains, etc.) | ✅ Yes | They shell out to the real `git` binary |
+| AI coding assistants (Claude Code, GitHub Copilot, etc.) running `git commit` normally | ✅ Yes | Same `git commit` path — verified by test, hook can't tell a human from an agent |
+| A human or an AI agent deliberately running `git commit --no-verify` | ❌ No | `--no-verify` explicitly skips all git hooks — no client-side hook can stop this |
+| A commit made via the GitHub API / a GitHub App / an MCP server that writes commits directly to the remote (bypassing local `git` entirely) | ❌ No | No local `git commit` ever runs, so there's no hook to trigger |
+| A machine or CI runner that never installed the hook (global) and a repo without `.githooks` + `core.hooksPath` set (per-repo) | ❌ No | The hook simply doesn't exist there |
+| Any of the above bypass cases | ✅ Covered by Option C | A CI backstop ([`templates/gitleaks-ci.yml`](templates/gitleaks-ci.yml)) re-scans server-side, independent of how the commit reached `origin` |
 
 ## Limitations
 
