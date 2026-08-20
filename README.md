@@ -11,6 +11,7 @@ all go through the real `git` binary.
 
 ```bash
 brew tap anhducmata/gitleaks-auto
+brew trust anhducmata/gitleaks-auto
 brew install gitleaks-auto
 ```
 
