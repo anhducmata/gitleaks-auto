@@ -16,6 +16,22 @@ brew install gitleaks-auto
 
 To apply the hook to a repo that already exists (created before installing), re-run `git init` inside it — the hook only attaches automatically on `git init`/`git clone`.
 
+## Which ways of committing does this block?
+
+Git hooks run based on the `git commit` porcelain command itself, not on whatever
+triggered it — so this blocks a leaked secret regardless of how the commit was made,
+as long as it goes through the real `git` binary. Verified to block secrets when
+committing via:
+
+- Plain terminal — `git commit`
+- IDE git integrations — VS Code, JetBrains, etc. (they shell out to `git`)
+- AI coding assistants — GitHub Copilot, Claude Code, and similar tools that run
+  `git commit` on your behalf
+
+What it does **not** block: commits made with `git commit --no-verify` (explicitly
+skips hooks), and any commit made on a machine where this hook was never installed
+(see Limitations below).
+
 ## Limitations
 
 This is a **local, client-side** hook, so it has the same limits as any git hook:
