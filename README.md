@@ -9,12 +9,46 @@ they all invoke the real `git` binary, which is what runs the hook.
 
 ## Installation
 
+There are two ways to install the hook, depending on whether you want to protect
+just your own machine or an entire team/repo.
+
+### Option A: Global (protects every repo on your machine)
+
 ```bash
 brew tap anhducmata/gitleaks-auto
 brew install gitleaks-auto
 ```
 
 To apply the hook to a repo that already exists (created before installing), re-run `git init` inside it — the hook only attaches automatically on `git init`/`git clone`.
+
+This is quick for a solo developer, but it lives on your machine only — a
+teammate who clones the repo, or CI, gets no protection unless they also
+install it themselves.
+
+### Option B: Per-repo (recommended for teams — travels with the repo)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/anhducmata/gitleaks-auto/main/install-repo.sh | bash
+```
+
+or clone this repo and run `install-repo.sh` from your project's root. This
+installs Gitleaks (if needed) and writes a **tracked** `.githooks/pre-commit`
+hook, then points the repo at it via `git config core.hooksPath .githooks`.
+
+Commit the `.githooks/` folder so it ships with the repo. Each teammate still
+needs to run `git config core.hooksPath .githooks` once after cloning (git
+never auto-enables hooks from a fresh clone, for security reasons), but the
+hook script itself is now version-controlled and identical for everyone —
+no more "did you remember to install the global hook?" drift between machines.
+
+### Option C: CI backstop (catches anything that slips past local hooks)
+
+Local hooks — global or per-repo — can always be skipped with
+`git commit --no-verify`, or simply not be installed on someone's machine.
+For a check that can't be bypassed by the committing client, add
+[`templates/gitleaks-ci.yml`](templates/gitleaks-ci.yml) to your repo as
+`.github/workflows/gitleaks.yml`. It re-scans every push and pull request
+server-side, independent of local setup.
 
 ## Which ways of committing does this block?
 
